@@ -1,0 +1,8 @@
+# Ignore everything by default
+*
+
+# But track .bat files
+!*.bat
+
+# Also track .gitignore itself
+!.gitignore
