@@ -60,6 +60,39 @@ Write-Host ""
 # ========================================================================
 
 try {
+    # STEP 0: Prerequisite validation
+    Write-Host "========================================"
+    Write-Host "STEP 0: PREREQUISITE VALIDATION"
+    Write-Host "========================================"
+    
+    $devDir = Join-Path $TargetFolder "dev"
+    $thirdPartyDir = Join-Path $TargetFolder "3rd-party"
+    $devPatch = Join-Path $thirdPartyDir "dev-patch"
+    $testPatch = Join-Path $thirdPartyDir "test-patch"
+    $nestedDevPatch = Join-Path $devPatch "dev-patch"
+    $nestedTestPatch = Join-Path $testPatch "test-patch"
+
+    if (-not (Test-Path $devDir)) {
+        throw "Validation failed: dev directory not found."
+    }
+    if (-not (Test-Path $thirdPartyDir)) {
+        throw "Validation failed: 3rd-party directory not found."
+    }
+    if (-not (Test-Path $devPatch)) {
+        throw "Validation failed: dev-patch directory not found in 3rd-party folder."
+    }
+    if (-not (Test-Path $testPatch)) {
+        throw "Validation failed: test-patch directory not found in 3rd-party folder."
+    }
+    if (Test-Path $nestedDevPatch) {
+        throw "Validation failed: Nested dev-patch directory found."
+    }
+    if (Test-Path $nestedTestPatch) {
+        throw "Validation failed: Nested test-patch directory found."
+    }
+    Write-Host "Prerequisites validated successfully." -ForegroundColor Green
+    Write-Host ""
+
     # Call the repository cloning module
     Write-Host "========================================"
     Write-Host "STEP 1: CLONING REPOSITORIES"

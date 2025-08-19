@@ -76,17 +76,18 @@ for ($i = 0; $i -lt $copyPairs.Count; $i++) {
             $skippedCount++
             continue
         }
-    }
-    
-    # Create target directory structure if needed
-    $targetParent = Split-Path $fullTarget -Parent
-    if (-not (Test-Path $targetParent)) {
-        Write-Host "  Creating target directory structure..."
+
+        # User confirmed overwrite, so clean the directory first
+        Write-Host "  Cleaning target directory..."
         try {
-            New-Item -Path $targetParent -ItemType Directory -Force -ErrorAction Stop | Out-Null
+            $itemsToRemove = Get-ChildItem -Path $fullTarget
+            if ($fullTarget -like "*\3rd-party") {
+                $itemsToRemove = $itemsToRemove | Where-Object { $_.Name -notin @("dev-patch", "test-patch") }
+            }
+            $itemsToRemove | Remove-Item -Recurse -Force -ErrorAction Stop
         }
         catch {
-            Write-Host "  ERROR: Failed to create target directory: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "  ERROR: Failed to clean target directory: $($_.Exception.Message)" -ForegroundColor Red
             $errorCount++
             continue
         }
@@ -95,7 +96,12 @@ for ($i = 0; $i -lt $copyPairs.Count; $i++) {
     # Copy the folder
     Write-Host "  Copying folder and contents..."
     try {
-        Copy-Item $fullSource $fullTarget -Recurse -Force -ErrorAction Stop
+        # Ensure the target directory exists, creating it if necessary
+        New-Item -Path $fullTarget -ItemType Directory -Force -ErrorAction Stop | Out-Null
+        
+        # Copy the contents of the source to the target
+        Copy-Item -Path "$fullSource\*" -Destination $fullTarget -Recurse -Force -ErrorAction Stop
+        
         Write-Host "  Successfully copied" -ForegroundColor Green
         $copiedCount++
     }

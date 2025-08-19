@@ -206,8 +206,8 @@ Write-Host "[3/3] Patching test directories..."
 
 # Define copy operations
 $copyOperations = @(
-	@{ Source = "3rd-party\test-patch\TestModels"; Target = "test\TestModels"; Name = "TestModels" },
-	@{ Source = "3rd-party\test-patch\TestCases"; Target = "test\TestCases"; Name = "TestCases" },
+	# @{ Source = "3rd-party\test-patch\TestModels"; Target = "test\TestModels"; Name = "TestModels" },
+	# @{ Source = "3rd-party\test-patch\TestCases"; Target = "test\TestCases"; Name = "TestCases" },
 	@{ Source = "3rd-party\test-patch\CIMSpy\powerflow"; Target = "test\CIMSpy\powerflow"; Name = "CIMSpy powerflow" },
 	@{ Source = "3rd-party\test-patch\CIMSpy\ModelDepositories"; Target = "test\CIMSpy\ModelDepositories"; Name = "CIMSpy ModelDepositories" },
 	@{ Source = "3rd-party\test-patch\CIMSpy\export"; Target = "test\CIMSpy\export"; Name = "CIMSpy export" },
