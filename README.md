@@ -54,7 +54,18 @@ Target Folder/
 2. **Prompts**: Asks for confirmation before overwriting existing directories.
 3. **Summary**: Reports on copied, skipped, and failed operations.
 
-### Phase 3: Patch Installation (`patch-installation.ps1`)
+### Phase 3: File Recovery from Local Git (`recover_files_from_local_git.ps1`)
+1. **Regular Repositories**: Executes `git reset --hard HEAD` for local repositories:
+   - `doc/Guides`
+   - `test/TestCases`
+   - `test/TestModels`
+2. **Bare Repositories**: Executes `git --git-dir=<git_dir> --work-tree=. reset --hard HEAD` for configuration repositories:
+   - `test/CIMSpy/Customization/AEP` (AEPConfig.git)
+   - `test/CIMSpy/Customization/CPS` (CPSConfig.git)
+   - `test/CIMSpy/Customization/Oncor` (OncorConfig.git)
+3. **Results**: Recovers files to their last committed state, ensuring clean working directories.
+
+### Phase 4: Patch Installation (`patch-installation.ps1`)
 1. **Dev Patching**: Copies development patches (e.g., `RawDataService.cs`).
 2. **Library Management**: Updates Python/C++ libraries and cleans old versions.
 3. **Test Data**: Applies test patches (models, configurations, sample data).
@@ -72,6 +83,7 @@ Target Folder/
 - **`set_up_code_base.ps1`** - Main entry point with parameter parsing.
 - **`clone_repos.ps1`** - Repository cloning module.
 - **`copy_from_PI-Shared.ps1`** - Module for copying from the PI-Shared folder.
+- **`recover_files_from_local_git.ps1`** - Module for recovering files from local git repositories.
 - **`patch-installation.ps1`** - Patch application module.
 
 ## Troubleshooting

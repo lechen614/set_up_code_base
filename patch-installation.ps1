@@ -2,7 +2,10 @@
 # Patch Installation Script - PowerShell Version
 # ========================================================================
 # This script applies patches to the development and test directories
-# after repositories have been cloned and files copied from PI-Shared.
+# after repositories have been cloned, files recovered from local git,
+# and files copied from PI-Shared.
+# 
+# This is Step 4 in the setup process.
 # ========================================================================
 
 # ========================================================================

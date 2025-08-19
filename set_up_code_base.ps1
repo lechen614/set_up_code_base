@@ -33,6 +33,8 @@ param(
 #   - Handles errors gracefully with clear messages
 #   - Uses modular clone_repos.ps1 for repository operations
 #   - Uses modular copy_from_PI-Shared.ps1 for copying from PI-Shared folder
+#   - Uses modular recover_files_from_local_git.ps1 for file recovery from local git repositories
+#   - Uses modular patch-installation.ps1 for applying patches
 # ========================================================================
 
 # Validate that source folder exists
@@ -124,10 +126,26 @@ try {
         Write-Host "WARNING: Copy from PI-Shared encountered errors but continuing..." -ForegroundColor Yellow
     }
     
-    # Apply patches after successful repository cloning and copying
+    # Recover files from local git repositories
     Write-Host ""
     Write-Host "========================================"
-    Write-Host "STEP 3: APPLYING PATCHES"
+    Write-Host "STEP 3: RECOVERING FILES FROM LOCAL GIT"
+    Write-Host "========================================"
+    
+    $recoverScript = Join-Path $PSScriptRoot "recover_files_from_local_git.ps1"
+    if (-not (Test-Path $recoverScript)) {
+        throw "recover_files_from_local_git.ps1 not found in the same directory as this script"
+    }
+    
+    & $recoverScript
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "WARNING: File recovery from local git encountered errors but continuing..." -ForegroundColor Yellow
+    }
+    
+    # Apply patches after successful repository cloning, copying, and file recovery
+    Write-Host ""
+    Write-Host "========================================"
+    Write-Host "STEP 4: APPLYING PATCHES"
     Write-Host "========================================"
     
     $patchScript = Join-Path $PSScriptRoot "patch-installation.ps1"
