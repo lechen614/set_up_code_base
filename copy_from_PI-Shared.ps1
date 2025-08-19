@@ -76,16 +76,6 @@ for ($i = 0; $i -lt $copyPairs.Count; $i++) {
             $skippedCount++
             continue
         }
-        
-        Write-Host "  Removing existing target folder..."
-        try {
-            Remove-Item $fullTarget -Recurse -Force -ErrorAction Stop
-        }
-        catch {
-            Write-Host "  ERROR: Failed to remove existing target folder: $($_.Exception.Message)" -ForegroundColor Red
-            $errorCount++
-            continue
-        }
     }
     
     # Create target directory structure if needed
