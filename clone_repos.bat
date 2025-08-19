@@ -15,6 +15,10 @@ REM   %1 - Target folder where repositories will be cloned
 REM ========================================================================
 
 set TARGET_FOLDER=%1
+set "cloned_count=0"
+set "updated_count=0"
+set "skipped_count=0"
+set "failed_count=0"
 
 if "%TARGET_FOLDER%"=="" (
     echo ERROR: Target folder parameter is required.
@@ -51,7 +55,9 @@ REM ========================================================================
 REM MAIN EXECUTION
 REM ========================================================================
 
-echo Starting repository cloning process...
+echo ========================================
+echo REPOSITORY CLONING MODULE
+echo ========================================
 echo Target folder: %TARGET_FOLDER%
 echo.
 
@@ -62,7 +68,6 @@ REM Create dev directory under target folder if it doesn't exist
 if not exist "%TARGET_FOLDER%\dev" mkdir "%TARGET_FOLDER%\dev"
 
 echo Processing 6 repositories...
-echo.
 
 REM Process each repository
 call :ProcessRepo %REPO1_URL% %REPO1_DIR% 1
@@ -84,8 +89,23 @@ call :ProcessRepo %REPO6_URL% %REPO6_DIR% 6
 if !errorlevel! neq 0 exit /b 1
 
 echo.
-echo All repositories have been cloned or updated to the latest.
-exit /b 0
+echo ========================================
+echo REPOSITORY CLONING SUMMARY
+echo ========================================
+echo Cloned: !cloned_count! repositories
+echo Updated: !updated_count! repositories  
+echo Skipped: !skipped_count! repositories
+echo Failed: !failed_count! repositories
+echo.
+if !failed_count! gtr 0 (
+    echo WARNING: Some repositories failed to process
+    echo ========================================
+    exit /b 1
+) else (
+    echo All repositories processed successfully
+    echo ========================================
+    exit /b 0
+)
 
 REM ========================================================================
 REM FUNCTION: ProcessRepo
@@ -109,6 +129,7 @@ set REPO_NUM=%3
 REM Extract repository name from the full directory path
 for %%f in ("%REPO_DIR%") do set REPO_NAME=%%~nxf
 
+echo.
 echo [%REPO_NUM%/6] Processing %REPO_NAME%...
 
 REM Check if the repository directory already exists
@@ -127,13 +148,14 @@ REM ========================================================================
 REM Prompts user to pull latest changes for existing repositories
 REM ========================================================================
 :handle_existing_repo
-echo Repository already exists: %REPO_DIR%
+echo %REPO_NAME%: Repository exists
 set /p PULL_CHOICE="Pull latest changes? (y/n): "
 if /i "!PULL_CHOICE!"=="y" (
     echo Pulling latest changes...
     call :pull_changes
 ) else (
-    echo Skipping %REPO_NAME%.
+    echo %REPO_NAME%: Skipped
+    set /a skipped_count+=1
 )
 goto :eof
 
@@ -144,12 +166,16 @@ REM Clones a new repository
 REM ========================================================================
 :handle_new_repo
 echo Cloning %REPO_NAME%...
-git clone %REPO_URL% "%REPO_DIR%"
+git clone %REPO_URL% "%REPO_DIR%" >nul 2>&1
 if !errorlevel! neq 0 (
-    echo ERROR: Failed to clone %REPO_NAME%. Aborting.
+    echo ERROR: Failed to clone %REPO_NAME%
+    echo   URL: %REPO_URL%
+    echo   Target: %REPO_DIR%
+    set /a failed_count+=1
     exit /b 1
 )
-echo Successfully cloned %REPO_NAME%.
+echo %REPO_NAME%: Cloned successfully
+set /a cloned_count+=1
 goto :eof
 
 REM ========================================================================
@@ -159,11 +185,14 @@ REM Pulls latest changes from the remote repository
 REM ========================================================================
 :pull_changes
 REM Change to repo directory, pull changes, then return to target folder
-cd /d "%REPO_DIR%" && git pull
+cd /d "%REPO_DIR%" && git pull >nul 2>&1
 if !errorlevel! neq 0 (
-    echo ERROR: Failed to pull %REPO_NAME%. Continuing...
+    echo ERROR: Failed to pull %REPO_NAME%
+    echo   Directory: %REPO_DIR%
+    set /a failed_count+=1
 ) else (
-    echo Successfully updated %REPO_NAME%.
+    echo %REPO_NAME%: Updated successfully
+    set /a updated_count+=1
 )
 
 REM Return to target folder

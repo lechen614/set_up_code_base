@@ -107,6 +107,14 @@ REM Call the repository cloning module
 call clone_repos.bat "%TARGET_FOLDER%"
 if !errorlevel! neq 0 goto :error_exit
 
+REM Apply patches after successful repository cloning
+echo.
+echo Applying patches...
+call patch-installation_revised.bat
+if !errorlevel! neq 0 (
+    echo WARNING: Patch installation encountered errors but continuing...
+)
+
 echo.
 echo Code base setup completed.
 pause

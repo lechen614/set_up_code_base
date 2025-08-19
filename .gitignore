@@ -1,8 +1,7 @@
 # Ignore everything by default
 *
 
-# But track .bat files
-!*.bat
-
-# Also track .gitignore itself
+# But track essential files
+!/*.bat
+!README.md
 !.gitignore
