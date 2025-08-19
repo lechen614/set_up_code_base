@@ -11,7 +11,9 @@ REM USAGE:
 REM   set_up_code_base.bat -source <source_folder> [-target <target_folder>]
 REM 
 REM PARAMETERS:
-REM   -source <folder>  - Required. The source folder for future operations
+REM   -source <folder>  - Required. The PI-Shared folder path. This varies by device
+REM                       as it's under OneDrive and may contain username prefixes.
+REM                       Example: C:\Users\[username]\OneDrive - POWER INFO LLC\[customized_folder_name]\PI-Shared
 REM   -target <folder>  - Optional. Target folder for cloning repos. 
 REM                       If not provided, uses current directory.
 REM
@@ -25,6 +27,7 @@ REM   - Prompts user to pull latest changes for existing repos
 REM   - Creates necessary directories automatically
 REM   - Handles errors gracefully with clear messages
 REM   - Uses modular clone_repos.bat for repository operations
+REM   - Uses modular copy_from_PI-Shared.ps1 (PowerShell) for copying from PI-Shared folder
 REM ========================================================================
 
 REM ========================================================================
@@ -82,13 +85,14 @@ goto :start_setup
 echo USAGE: %~nx0 -source ^<source_folder^> [-target ^<target_folder^>]
 echo.
 echo PARAMETERS:
-echo   -source ^<folder^>  - Required. The source folder for future operations
+echo   -source ^<folder^>  - Required. The PI-Shared folder path. This varies by device
+echo                       as it's under OneDrive and may contain username prefixes.
+echo                       Example: C:\Users\[username]\OneDrive - POWER INFO LLC\[customized_folder_name]\PI-Shared
 echo   -target ^<folder^>  - Optional. Target folder for cloning repos.
 echo                       If not provided, uses current directory.
 echo.
 echo EXAMPLES:
-echo   %~nx0 -source C:\configs
-echo   %~nx0 -source C:\configs -target D:\projects
+echo   %~nx0 -source "C:\Users\username\OneDrive - POWER INFO LLC\Shared with me\PI-Shared" -target C:\PowerInfo
 pause
 exit /b 1
 
@@ -107,7 +111,15 @@ REM Call the repository cloning module
 call clone_repos.bat "%TARGET_FOLDER%"
 if !errorlevel! neq 0 goto :error_exit
 
-REM Apply patches after successful repository cloning
+REM Copy files from PI-Shared folder
+echo.
+echo Copying from PI-Shared folder...
+powershell -ExecutionPolicy Bypass -File "copy_from_PI-Shared.ps1" -SourceFolder "%SOURCE_FOLDER%" -TargetFolder "%TARGET_FOLDER%"
+if !errorlevel! neq 0 (
+    echo WARNING: Copy from PI-Shared encountered errors but continuing...
+)
+
+REM Apply patches after successful repository cloning and copying
 echo.
 echo Applying patches...
 call patch-installation_revised.bat

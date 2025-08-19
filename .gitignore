@@ -3,5 +3,6 @@
 
 # But track essential files
 !/*.bat
+!/*.ps1
 !README.md
 !.gitignore
