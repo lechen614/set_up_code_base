@@ -69,8 +69,9 @@ try {
     
     $devDir = Join-Path $TargetFolder "dev"
     $thirdPartyDir = Join-Path $TargetFolder "3rd-party"
-    $devPatch = Join-Path $thirdPartyDir "dev-patch"
-    $testPatch = Join-Path $thirdPartyDir "test-patch"
+    $miscDir = Join-Path $TargetFolder "misc"
+    $devPatch = Join-Path $miscDir "dev-patch"
+    $testPatch = Join-Path $miscDir "test-patch"
     $nestedDevPatch = Join-Path $devPatch "dev-patch"
     $nestedTestPatch = Join-Path $testPatch "test-patch"
 
@@ -80,11 +81,14 @@ try {
     if (-not (Test-Path $thirdPartyDir)) {
         throw "Validation failed: 3rd-party directory not found."
     }
+    if (-not (Test-Path $miscDir)) {
+        throw "Validation failed: misc directory not found."
+    }
     if (-not (Test-Path $devPatch)) {
-        throw "Validation failed: dev-patch directory not found in 3rd-party folder."
+        throw "Validation failed: dev-patch directory not found in misc folder."
     }
     if (-not (Test-Path $testPatch)) {
-        throw "Validation failed: test-patch directory not found in 3rd-party folder."
+        throw "Validation failed: test-patch directory not found in misc folder."
     }
     if (Test-Path $nestedDevPatch) {
         throw "Validation failed: Nested dev-patch directory found."
@@ -142,21 +146,24 @@ try {
         Write-Host "WARNING: File recovery from local git encountered errors but continuing..." -ForegroundColor Yellow
     }
     
-    # Apply patches after successful repository cloning, copying, and file recovery
-    Write-Host ""
+    
+    # # Apply patches after successful repository cloning, copying, and file recovery
+    # Write-Host ""
     Write-Host "========================================"
-    Write-Host "STEP 4: APPLYING PATCHES"
+    # Write-Host "STEP 4: APPLYING PATCHES"
+    Write-Host "STEP 4 SKIPPED "
+
     Write-Host "========================================"
     
-    $patchScript = Join-Path $PSScriptRoot "patch-installation.ps1"
-    if (-not (Test-Path $patchScript)) {
-        throw "patch-installation.ps1 not found in the same directory as this script"
-    }
+    # $patchScript = Join-Path $PSScriptRoot "patch-installation.ps1"
+    # if (-not (Test-Path $patchScript)) {
+    #     throw "patch-installation.ps1 not found in the same directory as this script"
+    # }
     
-    & $patchScript
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "WARNING: Patch installation encountered errors but continuing..." -ForegroundColor Yellow
-    }
+    # & $patchScript
+    # if ($LASTEXITCODE -ne 0) {
+    #     Write-Host "WARNING: Patch installation encountered errors but continuing..." -ForegroundColor Yellow
+    # }
     
     Write-Host ""
     Write-Host "========================================"
